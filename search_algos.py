@@ -1,7 +1,8 @@
-import heapq
 import time
+import matplotlib.pyplot as plt
 from collections import deque
 
+# ------------------ Romania Map ------------------
 
 romania_map = {
     'Arad': {'Zerind': 75, 'Timisoara': 118, 'Sibiu': 140},
@@ -19,91 +20,110 @@ romania_map = {
     'Bucharest': {'Fagaras': 211, 'Pitesti': 101}
 }
 
-sld_to_bucharest = {
-    'Arad': 366,
-    'Bucharest': 0,
-    'Craiova': 260,
-    'Drobeta': 242,
-    'Eforie': 161,
-    'Fagaras': 176,
-    'Giurgiu': 77,
-    'Hirsova': 151,
-    'Iasi': 226,
-    'Lugoj': 244,
-    'Mehadia': 241,
-    'Neamt': 234,
-    'Oradea': 380,
-    'Pitesti': 100,
-    'Rimnicu Vilcea': 193,
-    'Sibiu': 253,
-    'Timisoara': 329,
-    'Urziceni': 80,
-    'Vaslui': 199,
-    'Zerind': 374
-}
+# Heuristic for BFS / A*
+sld_to_bucharest = { 'Arad': 366, 'Bucharest': 0, 'Craiova': 260, 'Drobeta': 242, 'Eforie': 161, 'Fagaras': 176, 'Giurgiu': 77, 'Hirsova': 151, 'Iasi': 226, 'Lugoj': 244, 'Mehadia': 241, 'Neamt': 234, 'Oradea': 380, 'Pitesti': 100, 'Rimnicu Vilcea': 193, 'Sibiu': 253, 'Timisoara': 329, 'Urziceni': 80, 'Vaslui': 199, 'Zerind': 374 }
 
-def depth_first_search(graph, start, goal):
-    stack = [(start, [start])]
-    visited = set()
+def calculate_path_cost(graph, path):
+    cost = 0
+    for i in range(len(path) - 1):
+        cost += graph[path[i]][path[i + 1]]
+    return cost
+
+
+# ------------------ DFS ------------------
+
+def depth_first_search(graph, start, goal, runs=1):
+    total_time = 0
+    final_path = []
     nodes_expanded = 0
 
-    while stack:
-        current_city, path = stack.pop()
-        nodes_expanded += 1
+    for _ in range(runs):
+        stack = [(start, [start])]
+        visited = set()
 
-        if current_city == goal:
-            print("\nDFS: Goal found!")
-            print(f"Path: {path}")
-            print(f"Total cities visited (nodes expanded): {nodes_expanded}")
-            return
+        start_time = time.perf_counter()
 
-        if current_city not in visited:
-            visited.add(current_city)
+        while stack:
+            current_city, path = stack.pop()
+            nodes_expanded += 1
 
-            for neighbor in graph[current_city]:
-                if neighbor not in visited:
-                    stack.append((neighbor, path + [neighbor]))
+            if current_city == goal:
+                final_path = path
+                break
 
-    print("\nDFS: No path found.")
+            if current_city not in visited:
+                visited.add(current_city)
+                for neighbor in graph[current_city]:
+                    if neighbor not in visited:
+                        stack.append((neighbor, path + [neighbor]))
+
+        total_time += (time.perf_counter() - start_time)
+
+    cost = calculate_path_cost(graph, final_path)
+
+    print(f"\nDFS: {goal} found!")
+    print(f"Path: {final_path}")
+    print(f"Path length: {len(final_path)}")
+    print(f"Path cost: {cost}")
     print(f"Total cities visited (nodes expanded): {nodes_expanded}")
-    return
+    print(f"Time over {runs} run(s): {total_time:.8f} seconds")
 
-def breadth_first_search(graph, start, goal):
-    queue = deque([(start, [start])])
-    visited = set()
+    return total_time
+
+# ------------------ BFS ------------------
+
+def breadth_first_search(graph, start, goal, runs=1):
+    total_time = 0
+    final_path = []
     nodes_expanded = 0
 
-    while queue:
-        current_city, path = queue.popleft()
-        nodes_expanded += 1
+    for _ in range(runs):
+        queue = deque([(start, [start])])
+        visited = set()
 
-        if current_city == goal:
-            print("\nBFS: Goal found!")
-            print(f"Path: {path}")
-            print(f"Total cities visited (nodes expanded): {nodes_expanded}")
-            return
+        start_time = time.perf_counter()
 
-        if current_city not in visited:
-            visited.add(current_city)
+        while queue:
+            current_city, path = queue.popleft()
+            nodes_expanded += 1
 
-            for neighbor in graph[current_city]:
-                if neighbor not in visited:
-                    queue.append((neighbor, path + [neighbor]))
+            if current_city == goal:
+                final_path = path
+                break
 
-    print("\nBFS: No path found.")
+            if current_city not in visited:
+                visited.add(current_city)
+                for neighbor in graph[current_city]:
+                    if neighbor not in visited:
+                        queue.append((neighbor, path + [neighbor]))
+
+        total_time += (time.perf_counter() - start_time)
+
+    cost = calculate_path_cost(graph, final_path)
+
+    print(f"\nBFS: {goal} found!")
+    print(f"Path: {final_path}")
+    print(f"Path length: {len(final_path)}")
+    print(f"Path cost: {cost}")
     print(f"Total cities visited (nodes expanded): {nodes_expanded}")
-    return
+    print(f"Time over {runs} run(s): {total_time:.8f} seconds")
+
+    return total_time
 
 
+# ------------------ Informed Searches ------------------
 def best_first_search(graph, start, goal, heuristic):
     return
 
 def a_star_search(graph, start, goal, heuristic):
     return
 
+# ------------------ Main ------------------
+
 if __name__ == "__main__":
-    depth_first_search(romania_map, 'Arad', 'Bucharest')
-    breadth_first_search(romania_map, 'Arad', 'Bucharest')
+    depth_first_search(romania_map, 'Arad', 'Bucharest', runs=10000)
+    breadth_first_search(romania_map, 'Arad', 'Bucharest', runs=10000)
+
     best_first_search(
         graph=romania_map,
         start='Arad',
@@ -116,5 +136,3 @@ if __name__ == "__main__":
         goal='Bucharest',
         heuristic=sld_to_bucharest
     )
-
-
