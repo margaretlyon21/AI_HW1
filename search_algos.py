@@ -138,6 +138,7 @@ def heuristic_2(graph, city, goal, sld_to_bucharest):
     
 # ------------------ Greedy Algorithm ------------------
 def greedy(graph, start, goal, heuristic_fn, number_of_iterations):
+    print("\n" +(heuristic_fn.__name__))
     total_time = 0
 
     for _ in range(number_of_iterations):
