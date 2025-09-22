@@ -155,7 +155,7 @@ if __name__ == "__main__":
     depth_first_search(romania_map, 'Arad', 'Bucharest', runs=10000)
     breadth_first_search(romania_map, 'Arad', 'Bucharest', runs=10000)
 
-    best_first_search(romania_map, 'Arad', 'Bucharest', heuristics_1, runs = 10000)
+    best_first_search(romania_map, 'Arad', 'Bucharest', heuristics_1)
     
     a_star_search(
         romania_map,
