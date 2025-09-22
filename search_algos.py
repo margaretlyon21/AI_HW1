@@ -131,39 +131,53 @@ def heuristic_2(graph, city, goal, sld_to_bucharest):
     return min(distances)
     
 # ------------------ Greedy Algorithm ------------------
-def greedy(graph, start, goal, heuristic_fn):
-    #initialize variables
-    frontier = [(heuristic_fn(romania_map, start, goal, sld), start)]
-    came_from = {}
-    cost_so_far = {start: 0}
-    cities_visited = 0
-    estimated_distance = 0
+def greedy(graph, start, goal, heuristic_fn, number_of_iterations):
+    total_time = 0
 
-    while frontier:
-        _, current = heapq.heappop(frontier)
-        cities_visited += 1
+    for _ in range(number_of_iterations):
+        # re-init per iteration so each run is independent
+        frontier = [(heuristic_fn(romania_map, start, goal, sld), start)]
+        came_from = {}
+        cost_so_far = {start: 0}
+        cities_visited = 0
+        estimated_distance = 0
 
-        #sucessfully reached city
-        if current == goal:
-            path = [goal]
-            while path[-1] != start:
-                path.append(came_from[path[-1]])
-                estimated_distance += dict(romania_map[path[-2]])[path[-1]]
-            path.reverse()
-            # return estimated_distance
-            return cities_visited
+        # start timing the actual work for this iteration
+        start_time = time.perf_counter()
 
-        #visit neighbors
-        for next_node, distance in graph[current]:
-            new_cost = cost_so_far[current] + distance
-            #if node is not visited or if node's cost is cheaper
-            if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
-                cost_so_far[next_node] = new_cost
-                priority = heuristic_fn(romania_map, next_node, goal, sld)
-                heapq.heappush(frontier, (priority, next_node))
-                came_from[next_node] = current
+        while frontier:
+            _, current = heapq.heappop(frontier)
+            cities_visited += 1
 
-    return None, cities_visited  # No path found
+            #sucessfully reached city
+            if current == goal:
+                path = [goal]
+                while path[-1] != start:
+                    path.append(came_from[path[-1]])
+                    estimated_distance += dict(romania_map[path[-2]])[path[-1]]
+                path.reverse()
+                # city is found, so it must end the loop
+                # return cities_visited
+                break
+
+            #visit neighbors
+            for next_node, distance in graph[current]:
+                new_cost = cost_so_far[current] + distance
+                #if node is not visited or if node's cost is cheaper
+                if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
+                    cost_so_far[next_node] = new_cost
+                    priority = heuristic_fn(romania_map, next_node, goal, sld)
+                    heapq.heappush(frontier, (priority, next_node))
+                    came_from[next_node] = current
+
+        total_time += (time.perf_counter() - start_time)
+
+    print(f"\nBFS: {goal} found!")
+    print(f"Path: {path}")
+    print(f"Path length: {len(path)}")
+    print(f"Path cost: {estimated_distance}")
+    print(f"Total cities visited (nodes expanded): {cities_visited}")
+    print(f"Time over {number_of_iterations} run(s): {total_time:.8f} seconds")
 
 def track_speed_greedy(number_of_iterations):
     start_datetime = datetime.datetime.now()
