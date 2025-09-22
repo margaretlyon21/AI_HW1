@@ -149,6 +149,17 @@ def greedy(graph, start, goal, heuristic_fn):
 def a_star_search(graph, start, goal, heuristic):
     return
 
+def track_speed_greedy(number_of_iterations):
+    start_datetime = datetime.datetime.now()
+    
+    for i in range(number_of_iterations):
+        greedy(romania_map, "Arad", "Bucharest", heuristic_1)
+    
+    end_datetime = datetime.datetime.now()
+
+    execution_duration = end_datetime - start_datetime
+    print(f"Execution duration: {execution_duration}")
+
 # ------------------ Main ------------------
 
 if __name__ == "__main__":
