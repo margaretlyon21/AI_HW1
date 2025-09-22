@@ -179,7 +179,7 @@ def greedy(graph, start, goal, heuristic_fn, number_of_iterations):
 
         total_time += (time.perf_counter() - start_time)
 
-    print(f"\nBFS: {goal} found!")
+    print(f"\nGreedy: {goal} found!")
     print(f"Path: {path}")
     print(f"Path length: {len(path)}")
     print(f"Path cost: {estimated_distance}")
