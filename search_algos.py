@@ -45,13 +45,16 @@ def depth_first_search(graph, start, goal, runs=1):
         start_time = time.perf_counter()
 
         while stack:
+            #visit last node in path
             current_city, path = stack.pop()
             nodes_expanded += 1
 
+            #success condition
             if current_city == goal:
                 final_path = path
                 break
 
+            #add next city to visit to the stack
             if current_city not in visited:
                 visited.add(current_city)
                 for neighbor in graph[current_city]:
@@ -85,13 +88,16 @@ def breadth_first_search(graph, start, goal, runs=1):
         start_time = time.perf_counter()
 
         while queue:
+            #visit last node in path
             current_city, path = queue.popleft()
             nodes_expanded += 1
 
+            #success condition
             if current_city == goal:
                 final_path = path
                 break
 
+            #add next city to visit to the stack
             if current_city not in visited:
                 visited.add(current_city)
                 for neighbor in graph[current_city]:
