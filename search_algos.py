@@ -121,8 +121,10 @@ def breadth_first_search(graph, start, goal, runs=1):
 # ------------------ Informed Searches ------------------
 
 def heuristic_1(graph, city, goal, sld_to_bucharest):
+    """
+    Uses reverse triangle inequality logic to return the "lower bound" 
+    """
     return abs(sld_to_bucharest[city] - sld_to_bucharest[goal])
-    # return abs(sld_to_bucharest.get(city, 0) - sld_to_bucharest.get(goal, 0))
 
 def heuristic_2(graph, city, goal, sld_to_bucharest):
     distances = []
@@ -193,17 +195,20 @@ def A_algorithm(graph, start, goal, runs=1, heuristic_choice=1):
     final_path = []
     nodes_expanded = 0
 
+    # Follows chosen Heuristic method 
     if heuristic_choice == 1:
         def Heuristic(city): return heuristic_1(graph, city, goal, sld_to_bucharest)
     elif heuristic_choice == 2:
         def Heuristic(city): return heuristic_2(graph, city, goal, sld_to_bucharest)
 
+    # Seacrhed "runs" amount of times, or until arrived at goal
     for _ in range(runs):
         pqueue = []
-        tiebreaker = 0
+        tiebreaker = 0  # Used to break ties within the priority queue
         
         start_time = time.perf_counter()
-        
+
+        # Push starting location
         start_H = Heuristic(start)
         heapq.heappush(pqueue, (start_H, tiebreaker, start, 0, [start]))
         
@@ -214,16 +219,20 @@ def A_algorithm(graph, start, goal, runs=1, heuristic_choice=1):
             popped_eval_val, _, city, current_cost, path = heapq.heappop(pqueue)
             nodes_expanded += 1
 
+            # If that city is reached, you have successfully found the goal location, leave the for loop
             if city == goal:
                 final_path = path
                 break
 
+            # next we look at the current cities neighbors
             for neighbor, neighbor_cost in graph.get(city, {}).items():
                 trial_cost = current_cost + neighbor_cost
+                # if it is less distance to go to the neighbors, update to be considered the most efficient
                 if trial_cost < best_cost.get(neighbor, float('inf')):
                     best_cost[neighbor] = trial_cost
                     tiebreaker += 1
                     new_eval_val = trial_cost + Heuristic(neighbor)
+                    # Push that new value
                     heapq.heappush(pqueue, (new_eval_val, tiebreaker, neighbor, trial_cost, path + [neighbor]))
 
         total_time += (time.perf_counter() - start_time)
