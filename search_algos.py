@@ -167,7 +167,7 @@ def greedy(graph, start, goal, heuristic_fn, number_of_iterations):
                 break
 
             #visit neighbors
-            for next_node, distance in graph[current]:
+            for next_node, distance in graph[current].items():
                 new_cost = cost_so_far[current] + distance
                 #if node is not visited or if node's cost is cheaper
                 if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
