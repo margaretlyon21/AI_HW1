@@ -112,8 +112,39 @@ def breadth_first_search(graph, start, goal, runs=1):
 
 
 # ------------------ Informed Searches ------------------
-def best_first_search(graph, start, goal, heuristic):
-    return
+def greedy_best_first_search(start, heuristic, graph, goal):
+    #initialize variables
+    frontier = [(heuristic[start], start)]
+    came_from = {}
+    cost_so_far = {start: 0}
+    cities_visited = 0
+    estimated_distance = 0
+
+    while frontier:
+        _, current = heapq.heappop(frontier)
+        cities_visited += 1
+
+        #sucessfully reached city
+        if current == goal:
+            path = [goal]
+            while path[-1] != start:
+                path.append(came_from[path[-1]])
+                estimated_distance += dict(romania_map[path[-2]])[path[-1]]
+            path.reverse()
+            # return estimated_distance
+            return cities_visited
+
+        #visit neighbors
+        for next_node, distance in graph[current]:
+            new_cost = cost_so_far[current] + distance
+            #if node is not visited or if node's cost is cheaper
+            if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
+                cost_so_far[next_node] = new_cost
+                priority = heuristic[next_node]
+                heapq.heappush(frontier, (priority, next_node))
+                came_from[next_node] = current
+
+    return None, cities_visited  # No path found
 
 def a_star_search(graph, start, goal, heuristic):
     return
