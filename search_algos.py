@@ -179,17 +179,6 @@ def greedy(graph, start, goal, heuristic_fn, number_of_iterations):
     print(f"Total cities visited (nodes expanded): {cities_visited}")
     print(f"Time over {number_of_iterations} run(s): {total_time:.8f} seconds")
 
-def track_speed_greedy(number_of_iterations):
-    start_datetime = datetime.datetime.now()
-    
-    for i in range(number_of_iterations):
-        greedy(romania_map, "Arad", "Bucharest", heuristic_1)
-    
-    end_datetime = datetime.datetime.now()
-
-    execution_duration = end_datetime - start_datetime
-    print(f"Execution duration: {execution_duration}")
-
 # ------------------ A* Algorithm ------------------
 
 def A_algorithm(graph, start, goal, runs=1, heuristic_choice=1):
@@ -253,7 +242,7 @@ if __name__ == "__main__":
     depth_first_search(romania_map, 'Arad', 'Bucharest', runs=10000)
     breadth_first_search(romania_map, 'Arad', 'Bucharest', runs=10000)
 
-    best_first_search(romania_map, 'Arad', 'Bucharest', heuristics_1)
+    greedy(romania_map, 'Arad', 'Bucharest', heuristics_1)
     
     A_algorithm(
         graph=romania_map,
