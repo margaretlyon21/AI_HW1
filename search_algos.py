@@ -112,9 +112,9 @@ def breadth_first_search(graph, start, goal, runs=1):
 
 
 # ------------------ Informed Searches ------------------
-def greedy_best_first_search(start, heuristic, graph, goal):
+def greedy(graph, start, goal, heuristic_fn):
     #initialize variables
-    frontier = [(heuristic[start], start)]
+    frontier = [(heuristic_fn(romania_map, start, goal, sld), start)]
     came_from = {}
     cost_so_far = {start: 0}
     cities_visited = 0
@@ -140,7 +140,7 @@ def greedy_best_first_search(start, heuristic, graph, goal):
             #if node is not visited or if node's cost is cheaper
             if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
                 cost_so_far[next_node] = new_cost
-                priority = heuristic[next_node]
+                priority = heuristic_fn(romania_map, next_node, goal, sld)
                 heapq.heappush(frontier, (priority, next_node))
                 came_from[next_node] = current
 
