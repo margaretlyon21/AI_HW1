@@ -1,6 +1,7 @@
 import time
 import matplotlib.pyplot as plt
 from collections import deque
+import heapq
 
 # ------------------ Romania Map ------------------
 
@@ -112,6 +113,24 @@ def breadth_first_search(graph, start, goal, runs=1):
 
 
 # ------------------ Informed Searches ------------------
+
+def heuristic_1(graph, city, goal, sld_to_bucharest):
+    return abs(sld_to_bucharest[city] - sld_to_bucharest[goal])
+    # return abs(sld_to_bucharest.get(city, 0) - sld_to_bucharest.get(goal, 0))
+
+def heuristic_2(graph, city, goal, sld_to_bucharest):
+    distances = []
+    to_bucharest = sld_to_bucharest[goal]
+
+    neighbors = graph.get(city, {})
+    if not neighbors:
+        return heuristic_1(graph, city, goal, sld_to_bucharest)
+
+    for neighbor, distance in neighbors.items():
+        distances.append(distance + abs(sld_to_bucharest[neighbor] - to_bucharest))
+    return min(distances)
+    
+# ------------------ Greedy Algorithm ------------------
 def greedy(graph, start, goal, heuristic_fn):
     #initialize variables
     frontier = [(heuristic_fn(romania_map, start, goal, sld), start)]
@@ -146,9 +165,6 @@ def greedy(graph, start, goal, heuristic_fn):
 
     return None, cities_visited  # No path found
 
-def a_star_search(graph, start, goal, heuristic):
-    return
-
 def track_speed_greedy(number_of_iterations):
     start_datetime = datetime.datetime.now()
     
@@ -160,6 +176,63 @@ def track_speed_greedy(number_of_iterations):
     execution_duration = end_datetime - start_datetime
     print(f"Execution duration: {execution_duration}")
 
+# ------------------ A* Algorithm ------------------
+
+def A_algorithm(graph, start, goal, runs=1, heuristic_choice=1):
+    total_time = 0
+    final_path = []
+    nodes_expanded = 0
+
+    if heuristic_choice == 1:
+        def Heuristic(city): return heuristic_1(graph, city, goal, sld_to_bucharest)
+    elif heuristic_choice == 2:
+        def Heuristic(city): return heuristic_2(graph, city, goal, sld_to_bucharest)
+
+    for _ in range(runs):
+        pqueue = []
+        tiebreaker = 0
+        
+        start_time = time.perf_counter()
+        
+        start_H = Heuristic(start)
+        heapq.heappush(pqueue, (start_H, tiebreaker, start, 0, [start]))
+        
+        best_cost = {start: 0}
+
+        while pqueue:
+            #pop the evaluation value, and ignore the tiebreaker 
+            popped_eval_val, _, city, current_cost, path = heapq.heappop(pqueue)
+            nodes_expanded += 1
+
+            if city == goal:
+                final_path = path
+                break
+
+            for neighbor, neighbor_cost in graph.get(city, {}).items():
+                trial_cost = current_cost + neighbor_cost
+                if trial_cost < best_cost.get(neighbor, float('inf')):
+                    best_cost[neighbor] = trial_cost
+                    tiebreaker += 1
+                    new_eval_val = trial_cost + Heuristic(neighbor)
+                    heapq.heappush(pqueue, (new_eval_val, tiebreaker, neighbor, trial_cost, path + [neighbor]))
+
+        total_time += (time.perf_counter() - start_time)
+
+    total_cost = calculate_path_cost(graph, final_path)
+
+    if heuristic_choice == 1:
+        print(f"\nA* using Heuristic 1: {goal} found!")
+    elif heuristic_choice == 2:
+        print(f"\nA* using Heuristic 2: {goal} found!")
+    print(f"Path: {final_path}")
+    print(f"Path length: {len(final_path)}")
+    print(f"Path cost: {total_cost}")
+    print(f"Total cities visited (nodes expanded): {nodes_expanded}")
+    print(f"Time over {runs} run(s): {total_time:.8f} seconds")
+
+    return total_time
+    
+
 # ------------------ Main ------------------
 
 if __name__ == "__main__":
@@ -168,9 +241,19 @@ if __name__ == "__main__":
 
     best_first_search(romania_map, 'Arad', 'Bucharest', heuristics_1)
     
-    a_star_search(
-        romania_map,
+    A_algorithm(
+        graph=romania_map,
         start='Arad',
         goal='Bucharest',
-        heuristic=sld_to_bucharest
-    )
+        runs=10000,
+        heuristic_choice=1
+        )
+    
+    A_algorithm(
+        graph=romania_map,
+        start='Arad',
+        goal='Bucharest',
+        runs=10000,
+        heuristic_choice=2
+        )
+
