@@ -136,7 +136,7 @@ def greedy(graph, start, goal, heuristic_fn, number_of_iterations):
 
     for _ in range(number_of_iterations):
         # re-init per iteration so each run is independent
-        frontier = [(heuristic_fn(romania_map, start, goal, sld), start)]
+        frontier = [(heuristic_fn(romania_map, start, goal, sld_to_bucharest), start)]
         came_from = {}
         cost_so_far = {start: 0}
         cities_visited = 0
@@ -166,7 +166,7 @@ def greedy(graph, start, goal, heuristic_fn, number_of_iterations):
                 #if node is not visited or if node's cost is cheaper
                 if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
                     cost_so_far[next_node] = new_cost
-                    priority = heuristic_fn(romania_map, next_node, goal, sld)
+                    priority = heuristic_fn(romania_map, next_node, goal, sld_to_bucharest)
                     heapq.heappush(frontier, (priority, next_node))
                     came_from[next_node] = current
 
@@ -242,7 +242,8 @@ if __name__ == "__main__":
     depth_first_search(romania_map, 'Arad', 'Bucharest', runs=10000)
     breadth_first_search(romania_map, 'Arad', 'Bucharest', runs=10000)
 
-    greedy(romania_map, 'Arad', 'Bucharest', heuristics_1)
+    greedy(romania_map, 'Arad', 'Bucharest', heuristic_1, 10000)
+    greedy(romania_map, 'Arad', 'Bucharest', heuristic_2, 10000)
     
     A_algorithm(
         graph=romania_map,
